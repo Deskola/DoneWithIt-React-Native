@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import * as Yup from 'yup'; 
 
 
@@ -82,19 +82,26 @@ function ListingEditScreen(props) {
     const [uploadVisible, setUploadVisible] =useState(false);
     const [progress, setProgress] = useState(0);
 
-    const handleSubmit = async (listing) => {
+    const handleSubmit = async (listing, {resetForm}) => {
+      setProgress(0)
       setUploadVisible(true);
       const result = await listings.addListing(
         {...listing, location}, progress => setProgress(progress)
       );
       setUploadVisible(false)
-      if (!result.ok) return alert('Could not save the item.');
-      alert('Success');
-      
+      if (!result.ok) {
+        setUploadVisible(false)
+        return alert('Could not save the item.')
+      };      
+      resetForm();
     }
-    return (
+    return (  
         <Screen style={styles.container}>
-            {/* <UploadScreen progress={progress} visible={uploadVisible}/> */}
+          <ScrollView>
+            <UploadScreen 
+              onDone={() => setUploadVisible(false)} 
+              progress={progress} 
+              visible={uploadVisible}/>
             <AppFormik
                 initialValues={{
                     title:"",
@@ -130,6 +137,7 @@ function ListingEditScreen(props) {
                     placeholder="Description"/>
                 <SubmitButton title="Post"/>
             </AppFormik>
+          </ScrollView>
         </Screen>
     );
 }

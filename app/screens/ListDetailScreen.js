@@ -1,5 +1,7 @@
 import React from 'react';
-import { Image, StyleSheet, View,Text, ScrollView } from 'react-native';
+import { StyleSheet, View,Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Image } from 'react-native-expo-image-cache';
+import ContactSellerForm from '../components/ContactSellerForm';
 
 import ListItem from '../components/ListItem';
 import colors from '../config/colors';
@@ -8,11 +10,15 @@ import colors from '../config/colors';
 function ListDetailScreen({route}) {
   const listing = route.params;
     return (
-      <ScrollView >
-        <View>
+      <KeyboardAvoidingView
+        behavior="position"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 1000}>
+        <ScrollView > 
             <Image
-                source={{uri: listing.images[0].url}}
-                style={styles.image}/>
+                uri={listing.images[0].url}
+                preview={{uri: listing.images[0].thumbnailUrl}}
+                style={styles.image}
+                tint="light"/>
             <View style={styles.detailsContainer}>
                 <Text style={styles.title}>{listing.title}</Text>
                 <Text style={styles.price}>KSH{listing.price}</Text>
@@ -23,9 +29,10 @@ function ListDetailScreen({route}) {
                     subTitle="5 Listings"
                 />
                 </View>
-            </View>
-        </View>
+                <ContactSellerForm listing={listing}/>
+            </View>        
       </ScrollView>
+      </KeyboardAvoidingView>
     );
 }
 const styles = StyleSheet.create({

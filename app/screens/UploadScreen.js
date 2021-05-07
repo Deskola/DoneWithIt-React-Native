@@ -1,17 +1,37 @@
 import React from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
-import AppText from '../components/AppText';
+import * as Progress from 'react-native-progress';
+import LottieView from 'lottie-react-native';
 
-function UploadScreen({progress = 0, visible=false}) {
+import colors from '../config/colors';
+
+function UploadScreen({onDone, progress = 0, visible=false}) {
     return (
-        <Modal>
+        <Modal visible={visible}>
             <View style={styles.container}>
-                <AppText>{progress * 100}% </AppText>
+                {progress < 1 ?
+                    (<Progress.Bar 
+                    color={colors.primary} 
+                    progress={progress}
+                    width={200} />
+                ):(
+                    <LottieView
+                        autoPlay
+                        loop={false}
+                        duration={2}
+                        onAnimationFinish={onDone}
+                        source={require('../assets/animations/done.json')}
+                        style={styles.animation}/>)
+                }
+                
             </View>
         </Modal>
     );
 }
 const styles = StyleSheet.create({
+    animation: {
+        width: 100,
+    },
     container:{
         alignItems: "center",
         flex: 1,

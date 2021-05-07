@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, FlatList, StyleSheet } from 'react-native';
+import {Button, FlatList, StyleSheet } from 'react-native';
 
 import Card from '../components/Card';
 import listingApi from '../api/listings';
@@ -9,37 +9,42 @@ import routes from '../navigation/routes';
 import AppText from '../components/AppText';
 import AppButton from '../components/AppButton';
 import useApi from '../hooks/useApi';
+import ActivityIndicator from '../components/ActivityIndicator';
+
 
 
 
 function ListingScreen({navigation}) {
-    const {data: listings, error, loading, request: loadingListings} = useApi(listingApi.getistings);
+    const getListingApi = useApi(listingApi.getistings);
     
     
     useEffect(() => {
-        loadingListings();
+        getListingApi.request();
     }, [])
 
    
     return (
+        <>
+        <ActivityIndicator visible={getListingApi.loading}/>
         <Screen style={styles.screen}>
-            {error && <>
+            {getListingApi.error && <>
                 <AppText>Could not retrieve the listings.</AppText>
-                <AppButton title="Retry" onPress={loadingListings}/>
+                <AppButton title="Retry" onPress={getListingApi.request}/>
             </>}
-            <ActivityIndicator animating={true} size="large"/>
             <FlatList
-                data={listings}
+                data={getListingApi.data}
                 keyExtractor={(listingItem) => listingItem.id.toString()}
                 renderItem={({item}) =>
                     <Card
                         title={item.title}
-                        subTitle={"$" + item.price}
+                        subTitle={"KSH " + item.price}
                         imageUrl={item.images[0].url}
-                        onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}/>
+                        onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}
+                        thumbnailUrl={item.images[0].thumbnailUrl}/>
                 }
             />
         </Screen>
+        </>
     );
 }
 const styles = StyleSheet.create({
